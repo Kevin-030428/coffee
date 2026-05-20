@@ -1,2 +1,0 @@
-"""Coffee review system package."""
-
