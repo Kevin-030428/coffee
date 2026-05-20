@@ -76,8 +76,12 @@ def load_sentiment_pipeline() -> Any:
         "COFFEE_SENTIMENT_MODEL",
     )
     try:
-        return pipeline("text-classification", model=model_name, truncation=True)
-    except Exception:
+        print(f"Loading sentiment model from: {model_name}")
+        sentiment_pipe = pipeline("text-classification", model=model_name, truncation=True)
+        print(f"Loaded sentiment model from: {model_name}")
+        return sentiment_pipe
+    except Exception as exc:
+        print(f"Failed to load sentiment model from {model_name}: {exc}")
         return None
 
 
@@ -92,9 +96,20 @@ def load_ner_pipeline() -> Any:
         "COFFEE_NER_MODEL",
     )
     try:
-        return pipeline("token-classification", model=model_name, aggregation_strategy="simple")
-    except Exception:
+        print(f"Loading coffee NER model from: {model_name}")
+        ner_pipe = pipeline("token-classification", model=model_name, aggregation_strategy="simple")
+        print(f"Loaded coffee NER model from: {model_name}")
+        return ner_pipe
+    except Exception as exc:
+        print(f"Failed to load coffee NER model from {model_name}: {exc}")
         return None
+
+
+def _loaded_model_name(model_pipe: Any | None, fallback: str) -> str:
+    if model_pipe is None:
+        return fallback
+    model = getattr(model_pipe, "model", None)
+    return str(getattr(model, "name_or_path", fallback))
 
 
 def predict_sentiment(text: str, sentiment_pipe: Any | None) -> Prediction:
@@ -114,7 +129,7 @@ def predict_sentiment(text: str, sentiment_pipe: Any | None) -> Prediction:
                 label=normalized,
                 score=float(result.get("score", 0.0)),
                 runtime_ms=runtime_ms,
-                source="Hugging Face text-classification pipeline",
+                source=f"Hugging Face text-classification pipeline ({_loaded_model_name(sentiment_pipe, DEFAULT_SENTIMENT_MODEL)})",
             )
         except Exception:
             pass
@@ -212,7 +227,14 @@ def extract_coffee_entities(text: str, ner_pipe: Any | None) -> list[CoffeeEntit
                 end = int(item.get("end", -1))
                 if start >= 0 and end > start and (group.upper() in {"COFFEE", "MENU_ITEM", "DRINK"}):
                     model_entities.append(
-                        CoffeeEntity(word, "COFFEE", start, end, score, "Hugging Face token-classification pipeline")
+                        CoffeeEntity(
+                            word,
+                            "COFFEE",
+                            start,
+                            end,
+                            score,
+                            f"Hugging Face token-classification pipeline ({_loaded_model_name(ner_pipe, DEFAULT_NER_MODEL)})",
+                        )
                     )
         except Exception:
             model_entities = []
