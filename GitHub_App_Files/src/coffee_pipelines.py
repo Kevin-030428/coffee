@@ -31,8 +31,8 @@ APP_DIR = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = APP_DIR.parents[1]
 MODEL_ROOT = PROJECT_ROOT / "Group01_Dataset_files" / "Fine-tuned_Model_files"
 
-DEFAULT_SENTIMENT_MODEL = "distilbert-base-uncased-finetuned-sst-2-english"
-DEFAULT_NER_MODEL = "dslim/bert-base-NER"
+DEFAULT_SENTIMENT_MODEL = "Cry1008/coffee-sentiment"
+DEFAULT_NER_MODEL = "Cry1008/coffee-ner"
 
 
 @dataclass(frozen=True)

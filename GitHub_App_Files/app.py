@@ -412,7 +412,7 @@ with st.sidebar:
     st.subheader("Coffee vocabulary")
     st.write(", ".join(COFFEE_MENU))
     st.divider()
-    st.caption("The app loads Colab fine-tuned local models first, then falls back to public Hugging Face models if needed.")
+    st.caption("The app loads the Colab fine-tuned Hugging Face models: Cry1008/coffee-sentiment and Cry1008/coffee-ner.")
 
 sentiment_pipeline = cached_sentiment_pipeline()
 ner_pipeline = cached_ner_pipeline()
